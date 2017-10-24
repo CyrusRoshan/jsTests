@@ -44,15 +44,24 @@ for (var i = 0; i < questions.length; i++) {
     var elemText = newQuestion(question.functionName, question.functionParameters, question.text, question.docText);
     var elem = document.createRange().createContextualFragment(elemText);
 
-    // elem.querySelector('button')
     var div = elem.querySelector('div');
     var testButton = elem.querySelector('button');
-    var textArea = elem.querySelector('textarea');
     var message = elem.querySelector('#message');
+    var textarea = elem.querySelector('textarea')
+    var code = CodeMirror.fromTextArea(
+        textarea, {
+        lineNumbers: true,
+        mode: 'javascript',
+        theme: 'mbo',
+        styleActiveLine: true,
+        lineNumbers: true,
+        matchBrackets: true,
+        autoRefresh: true,
+    });
 
     var placedElem;
     testButton.onclick = function() {
-    	var test = testFunction(question.functionName, textArea.value);
+    	var test = testFunction(question.functionName, code.getValue());
 
         message.innerText = test.message;
         if (test.passed) {
@@ -80,10 +89,7 @@ function newQuestion(functionName, functionParameters, text, docText) {
             <h3>${functionName}</h3>
             <p>${text}</p>
             ${docCode}
-            <textarea>
-function ${functionName}(${functionParameters.join(', ')}) {
-
-}</textarea>
+            <textarea>function ${functionName}(${functionParameters.join(', ')}) {\n  return;\n}</textarea>
             <br>
             <p id="message"></p>
             <button>Test!</button>
