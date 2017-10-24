@@ -1,17 +1,92 @@
-var functionCases = {};
+const QUESTIONSELECTOR = document.querySelector('#questions');
 
-function newQuestion(functionName, question, testcases) {
-    functionCases[functionName] = testcases;
+var functionCases = {};
+var questions = [
+    // {
+    //     functionName: '',
+    //     functionParameters: [],
+    //     question: '',
+    //     docText: '',
+    //     testcases: [
+    //         {
+    //             arguments: [],
+    //             expectedResult: true,
+    //         },
+    //     ],
+    // },
+    {
+        functionName: 'add',
+        functionParameters: ['a', 'b'],
+        text: 'Create a function to add two numbers',
+        docText: '',
+        testcases: [
+            {
+                arguments: [1, 2],
+                expectedResult: 3,
+            },
+            {
+                arguments: [5, -6],
+                expectedResult: -1,
+            },
+            {
+                arguments: [23, 4],
+                expectedResult: 27,
+            },
+        ],
+    },
+];
+
+for (var i = 0; i < questions.length; i++) {
+    var question = questions[i];
+
+    functionCases[question.functionName] = question.testcases;
+
+    var elemText = newQuestion(question.functionName, question.functionParameters, question.text, question.docText);
+    var elem = document.createRange().createContextualFragment(elemText);
+
+    // elem.querySelector('button')
+    var div = elem.querySelector('div');
+    var testButton = elem.querySelector('button');
+    var textArea = elem.querySelector('textarea');
+    var message = elem.querySelector('#message');
+
+    var placedElem;
+    testButton.onclick = function() {
+    	var test = testFunction(question.functionName, textArea.value);
+
+        message.innerText = test.message;
+        if (test.passed) {
+            div.style.backgroundColor = "#ceffd9"
+        } else {
+            div.style.backgroundColor = "#ffb0b0"
+        }
+    }
+
+    QUESTIONSELECTOR.appendChild(elem);
+}
+
+function newQuestion(functionName, functionParameters, text, docText) {
+    var docCode = "";
+    if (docText) {
+        docCode = (`
+            <div id="document">
+                ${docText}
+            </div>
+        `);
+    }
 
     var elem = (`
         <div id="${functionName}">
             <h3>${functionName}</h3>
-            <p>${question}</p>
+            <p>${text}</p>
+            ${docCode}
             <textarea>
-                function ${functionName}() {
+function ${functionName}(${functionParameters.join(', ')}) {
 
-                }
-            </textarea>
+}</textarea>
+            <br>
+            <p id="message"></p>
+            <button>Test!</button>
         </div>
     `)
 
@@ -19,22 +94,32 @@ function newQuestion(functionName, question, testcases) {
 }
 
 function testFunction(functionName, testFunc, doc) {
-    var testDoc = doc.cloneNode(true)
+    var testDoc;
+    if (doc) {
+        testDoc = doc.cloneNode(true);
+    }
+
     var testcases = functionCases[functionName];
 
     for (var i = 0; i < testcases.length; i++) {
-        var case = testcases[i];
+        var testcase = testcases[i];
         var fakeWindow = {document: testDoc};
 
-        // We'll see how well my sandboxing works...
-        var caseResult = (function(window, document, testFunc, case) {
-            return func.apply(this, case.arguments);
-        }).call(fakeWindow, fakeWindow, fakeWindow.document, testFunc, case);
+        var result = Function('window', 'document', `
+            ${testFunc}
+            return ${functionName}.apply(this, ${JSON.stringify(testcase.arguments)})
+        `)(fakeWindow, fakeWindow.document)
 
-        if (caseResult != case.expectedResult) {
-            return false;
+        if (result != testcase.expectedResult) {
+            return {
+                passed: false,
+                message: `Case failed: ${functionName}(${testcase.arguments}). Value: ${result}, Expected value: ${testcase.expectedResult}`,
+            };
         }
     }
 
-    return true;
+    return {
+        passed: true,
+        message: '',
+    };
 }
