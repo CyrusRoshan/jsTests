@@ -34,6 +34,62 @@ var questions = [
             },
         ],
     },
+    {
+        functionName: 'removeG',
+        functionParameters: ['str'],
+        text: 'Create a function to remove all instances of the letter g from a string',
+        docText: '',
+        testcases: [
+            {
+                arguments: ['string'],
+                expectedResult: 'strin',
+            },
+            {
+                arguments: ['eggs'],
+                expectedResult: 'es',
+            },
+            {
+                arguments: ['ggggggggg'],
+                expectedResult: '',
+            },
+            {
+                arguments: [''],
+                expectedResult: '',
+            },
+            {
+                arguments: ['gegeg----egeg'],
+                expectedResult: 'ee----ee',
+            },
+        ],
+    },
+    {
+        functionName: 'printProgressBar',
+        functionParameters: ['percentDone'],
+        text: 'Create a function to print out the percentage complete in terms of ticks rounded down to the nearest ten. E.g. 50: "/////-----", 25: "//--------"',
+        docText: '',
+        testcases: [
+            {
+                arguments: ['0'],
+                expectedResult: '----------',
+            },
+            {
+                arguments: ['5'],
+                expectedResult: '----------',
+            },
+            {
+                arguments: ['62'],
+                expectedResult: '//////----',
+            },
+            {
+                arguments: ['100'],
+                expectedResult: '//////////',
+            },
+            {
+                arguments: ['99'],
+                expectedResult: '/////////-',
+            },
+        ],
+    },
 ];
 
 for (var i = 0; i < questions.length; i++) {
